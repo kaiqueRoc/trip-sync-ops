@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+coverage/
+
+# MSW
+public/mockServiceWorker.js
+
+# Generated OpenAPI types (rebuilt in CI/build)
+src/api/generated/
+
+# Logs
+*.log
+npm-debug.log*

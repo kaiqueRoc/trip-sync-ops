@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout contracts
+        uses: actions/checkout@v4
+        with:
+          repository: kaiqueRoc/trip-sync-contracts
+          path: trip-sync-contracts
+          ref: main
+        continue-on-error: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Build contracts
+        run: |
+          if [ -d trip-sync-contracts ]; then
+            cd trip-sync-contracts && npm ci && npm run build
+          elif [ -d ../trip-sync-contracts ]; then
+            cd ../trip-sync-contracts && npm ci && npm run build
+          else
+            echo "trip-sync-contracts not found — skipping"
+            exit 1
+          fi
+
+      - name: Link contracts for npm file dependency
+        run: |
+          if [ -d trip-sync-contracts ] && [ ! -d ../trip-sync-contracts ]; then
+            ln -sf "$(pwd)/trip-sync-contracts" ../trip-sync-contracts
+          fi
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build

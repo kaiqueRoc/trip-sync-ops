@@ -31,3 +31,4 @@ src/api/generated/
 # Logs
 *.log
 npm-debug.log*
+.vercel

@@ -1,7 +1,5 @@
 const rawApiUrl = import.meta.env.VITE_API_URL?.trim();
-const defaultApiUrl = import.meta.env.PROD
-  ? "https://trip-sync-api.vercel.app"
-  : "http://localhost:3333";
+const defaultApiUrl = import.meta.env.PROD ? "/api" : "http://localhost:3333";
 
 /** Base URL for TripSync API (no trailing slash). */
 export const API_URL = (rawApiUrl || defaultApiUrl).replace(/\/$/, "");

@@ -18,7 +18,10 @@ type QueryValue = string | number | boolean | undefined | null;
 function buildUrl(path: string, query?: Record<string, QueryValue>): string {
   const base = API_URL.replace(/\/$/, "");
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  const url = new URL(`${base}${normalized}`);
+  const absoluteUrl = /^https?:\/\//.test(base)
+    ? `${base}${normalized}`
+    : `${window.location.origin}${base}${normalized}`;
+  const url = new URL(absoluteUrl);
   if (query) {
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined && value !== null && value !== "") {

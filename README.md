@@ -31,7 +31,7 @@ Copie `.env.example` para `.env`:
 
 | Variável | Descrição |
 |----------|-----------|
-| `VITE_API_URL` | Base da API (padrão `http://localhost:3333` em dev e `https://trip-sync-api.vercel.app` em produção) |
+| `VITE_API_URL` | Base da API (padrão `http://localhost:3333` em dev e `/api` em produção, com rewrite para `trip-sync-api.vercel.app`) |
 | `VITE_USE_MSW` | `true` força mocks MSW |
 | `VITE_MSW_FALLBACK` | `true` (padrão em dev) ativa MSW se `/health` falhar |
 

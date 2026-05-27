@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://trip-sync-api.vercel.app/$1"
+    },
+    {
       "source": "/((?!api/.*).*)",
       "destination": "/index.html"
     }

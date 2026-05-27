@@ -8,7 +8,7 @@ import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { BookingForm } from "@/features/bookings/BookingForm";
-import { useBookings, useCreateBooking } from "@/api/queries";
+import { useBookings, useCreateBooking, useProviders } from "@/api/queries";
 import { formatDate, formatMoney } from "@/lib/format";
 import { bookingStatusVariant } from "@/lib/status";
 import type { BookingStatus } from "@/api/types";
@@ -19,6 +19,7 @@ export function BookingsListPage() {
   const page = Number(searchParams.get("page") ?? 1);
   const status = searchParams.get("status") as BookingStatus | null;
   const destination = searchParams.get("destination") ?? "";
+  const q = searchParams.get("q") ?? "";
 
   const query = useMemo(
     () => ({
@@ -31,7 +32,23 @@ export function BookingsListPage() {
   );
 
   const { data, isLoading, isError, refetch } = useBookings(query);
+  const providers = useProviders();
   const createBooking = useCreateBooking();
+  const providerById = useMemo(
+    () => new Map((providers.data?.data ?? []).map((provider) => [provider.id, provider])),
+    [providers.data],
+  );
+  const visibleBookings = useMemo(() => {
+    const rows = data?.data ?? [];
+    const term = q.trim().toLowerCase();
+    if (!term) return rows;
+    return rows.filter((booking) =>
+      [booking.reference, booking.id, booking.travelerName, booking.destination]
+        .join(" ")
+        .toLowerCase()
+        .includes(term),
+    );
+  }, [data, q]);
 
   return (
     <div className="page">
@@ -65,6 +82,21 @@ export function BookingsListPage() {
 
       <Card>
         <div className="filters">
+          <label className="filters__wide">
+            Buscar
+            <input
+              value={q}
+              placeholder="PNR, ID ou cliente..."
+              onChange={(e) => {
+                const next = new URLSearchParams(searchParams);
+                const val = e.target.value;
+                if (val) next.set("q", val);
+                else next.delete("q");
+                next.set("page", "1");
+                setSearchParams(next);
+              }}
+            />
+          </label>
           <label>
             Status
             <select
@@ -101,6 +133,9 @@ export function BookingsListPage() {
               }}
             />
           </label>
+          <button type="button" className="btn btn--secondary btn--filter">
+            May 20 — May 27, 2024
+          </button>
         </div>
 
         {isLoading ? <LoadingState /> : null}
@@ -116,35 +151,54 @@ export function BookingsListPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Referência</th>
-                  <th>Viajante</th>
-                  <th>Destino</th>
-                  <th>Período</th>
-                  <th>Valor</th>
+                  <th>PNR / ID</th>
+                  <th>Cliente</th>
+                  <th>Provedor</th>
+                  <th>Serviço</th>
+                  <th>Data da viagem</th>
                   <th>Status</th>
+                  <th>Valor</th>
                 </tr>
               </thead>
               <tbody>
-                {data.data.map((b) => (
+                {visibleBookings.map((b) => (
                   <tr key={b.id}>
                     <td>
                       <Link to={`/bookings/${b.id}`}>{b.reference}</Link>
+                      <span className="table__subtext">{b.id.slice(0, 10)}</span>
                     </td>
-                    <td>{b.travelerName}</td>
-                    <td>{b.destination}</td>
                     <td>
-                      {formatDate(b.checkIn)} — {formatDate(b.checkOut)}
+                      {b.destination}
+                      <span className="table__subtext">{b.travelerName}</span>
                     </td>
-                    <td>{formatMoney(b.amountCents, b.currency)}</td>
+                    <td>
+                      {b.providerId ? (
+                        providerById.get(b.providerId)?.name ?? b.providerId.slice(0, 10)
+                      ) : (
+                        <span className="muted">Sem provedor</span>
+                      )}
+                    </td>
+                    <td>{b.providerId ? "Hotel" : "Manual"}</td>
+                    <td>
+                      {formatDate(b.checkIn)}
+                      <span className="table__subtext">{formatDate(b.checkOut)}</span>
+                    </td>
                     <td>
                       <Badge variant={bookingStatusVariant(b.status)}>
                         {b.status}
                       </Badge>
                     </td>
+                    <td>{formatMoney(b.amountCents, b.currency)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
+            {visibleBookings.length === 0 ? (
+              <p className="empty-state">
+                Nenhuma reserva encontrada para os filtros atuais.
+              </p>
+            ) : null}
 
             <div className="pagination">
               <Button

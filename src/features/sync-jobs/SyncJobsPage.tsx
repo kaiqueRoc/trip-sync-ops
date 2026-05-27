@@ -25,6 +25,10 @@ export function SyncJobsPage() {
   );
 
   const { data, isLoading, isError, refetch } = useSyncJobs(query);
+  const queued = data?.filter((job) => job.status === "QUEUED").length ?? 0;
+  const running = data?.filter((job) => job.status === "RUNNING").length ?? 0;
+  const completed = data?.filter((job) => job.status === "COMPLETED").length ?? 0;
+  const failed = data?.filter((job) => job.status === "FAILED").length ?? 0;
 
   return (
     <div className="page">
@@ -32,6 +36,29 @@ export function SyncJobsPage() {
         title="Sync jobs"
         description="Fila de sincronização com provedores externos."
       />
+
+      <div className="grid grid--stats">
+        <Card>
+          <p className="stat__label">Queued</p>
+          <p className="stat__value stat__value--lg">{queued}</p>
+          <p className="stat__hint">aguardando worker</p>
+        </Card>
+        <Card>
+          <p className="stat__label">Running</p>
+          <p className="stat__value stat__value--lg">{running}</p>
+          <p className="stat__hint">em processamento</p>
+        </Card>
+        <Card>
+          <p className="stat__label">Completed</p>
+          <p className="stat__value stat__value--lg">{completed}</p>
+          <p className="stat__hint">sincronizados</p>
+        </Card>
+        <Card>
+          <p className="stat__label">Failed</p>
+          <p className="stat__value stat__value--lg">{failed}</p>
+          <p className="stat__hint">exigem ação</p>
+        </Card>
+      </div>
 
       <Card>
         <div className="filters">

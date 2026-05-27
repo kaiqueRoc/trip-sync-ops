@@ -13,6 +13,9 @@ export function ProvidersPage() {
   const [showForm, setShowForm] = useState(false);
   const { data, isLoading, isError, refetch } = useProviders();
   const createProvider = useCreateProvider();
+  const active = data?.data.filter((provider) => provider.active).length ?? 0;
+  const degraded =
+    data?.data.filter((provider) => provider.lastHealthStatus === "DOWN").length ?? 0;
 
   return (
     <div className="page">
@@ -25,6 +28,24 @@ export function ProvidersPage() {
           </Button>
         }
       />
+
+      <div className="grid grid--stats">
+        <Card>
+          <p className="stat__label">Provedores ativos</p>
+          <p className="stat__value stat__value--lg">{active}</p>
+          <p className="stat__hint">REST/SOAP conectados</p>
+        </Card>
+        <Card>
+          <p className="stat__label">Saúde degradada</p>
+          <p className="stat__value stat__value--lg">{degraded}</p>
+          <p className="stat__hint">exigem investigação</p>
+        </Card>
+        <Card>
+          <p className="stat__label">Tipos suportados</p>
+          <p className="stat__value stat__value--lg">REST + SOAP</p>
+          <p className="stat__hint">contratos normalizados no backend</p>
+        </Card>
+      </div>
 
       {showForm ? (
         <Card title="Registrar provedor">

@@ -6,6 +6,9 @@ import { BookingDetailPage } from "@/features/bookings/BookingDetailPage";
 import { ProvidersPage } from "@/features/providers/ProvidersPage";
 import { ProviderDetailPage } from "@/features/providers/ProviderDetailPage";
 import { SyncJobsPage } from "@/features/sync-jobs/SyncJobsPage";
+import { ReportsPage } from "@/features/reports/ReportsPage";
+import { AlertsPage } from "@/features/alerts/AlertsPage";
+import { SettingsPage } from "@/features/settings/SettingsPage";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +21,9 @@ export const router = createBrowserRouter([
       { path: "providers", element: <ProvidersPage /> },
       { path: "providers/:id", element: <ProviderDetailPage /> },
       { path: "sync-jobs", element: <SyncJobsPage /> },
+      { path: "reports", element: <ReportsPage /> },
+      { path: "alerts", element: <AlertsPage /> },
+      { path: "settings", element: <SettingsPage /> },
       { path: "*", element: <Navigate to="/" replace /> },
     ],
   },
